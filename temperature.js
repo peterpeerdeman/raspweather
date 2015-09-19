@@ -32,7 +32,28 @@ serialPort.open(function (error) {
     }
 });
 
-app.get('/', function(req, res) {
+app.get('/temperatures', function(req, res) {
+    fs.readFile('temperatures.txt', 'utf-8', function (err, data) {
+        if (err) throw err;
+            var lines = data.trim().split('\n');
+            var lastLines = lines.slice(-24);
+            var result = lastLines.map(function(line) {
+
+                var fields = line.split(';');
+
+                var date = fields[0];
+                var temperature = parseFloat(fields[1]);
+                return {
+                    date: date,
+                    temperature: temperature    
+                };
+            });
+
+            res.json(result);
+    });
+});
+
+app.get('/current', function(req, res) {
     fs.readFile('temperatures.txt', 'utf-8', function (err, data) {
         if (err) throw err;
             var lines = data.trim().split('\n');
@@ -40,13 +61,15 @@ app.get('/', function(req, res) {
             var fields = lastLine.split(';');
 
             var date = fields[0];
-            var temperature = fields[1];
+            var temperature = parseFloat(fields[1]);
             res.json({
                 date: date,
                 temperature: temperature    
             });
     });
 });
+
+app.use(express.static('public'));
 
 var server = app.listen(1234, function () {
   var host = server.address().address;
