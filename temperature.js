@@ -1,7 +1,9 @@
-var SerialPort = require("serialport").SerialPort
-var fs = require("fs");
-var serialPort = new SerialPort("/dev/serial/by-id/usb-Arduino__www.arduino.cc__Arduino_Uno_649363339363515081E1-if00", {
-    baudrate: 115200
+var serialport = require('serialport');
+var SerialPort = require('serialport').SerialPort
+var fs = require('fs');
+var serialPort = new SerialPort('/dev/serial/by-id/usb-Arduino__www.arduino.cc__Arduino_Uno_649363339363515081E1-if00', {
+    baudrate: 115200,
+    parser: serialport.parsers.readline('\n')
 }, false); // this is the openImmediately flag [default is true]
 var express = require('express');
 var app = express();
@@ -14,7 +16,7 @@ serialPort.open(function (error) {
     } else {
         console.log('now logging temperatures to file');
         serialPort.on('data', function(data) {
-            var stringData = '' + data;
+            var stringData = data.toString();
             var split = stringData.split(':');
             if (split.length > 0) {
                 var temperatureFloat = parseFloat(split[1]);
@@ -22,6 +24,7 @@ serialPort.open(function (error) {
                     var now = new Date();
                     if(now - lastTimeStamp > 1000 * 60 * 60) {
                         fs.appendFile('temperatures.txt', new Date().toString()+';'+ temperatureFloat + '\n', function (err) {
+                            //
                         });
                         console.log(temperatureFloat);
                         lastTimeStamp = now;
@@ -32,11 +35,18 @@ serialPort.open(function (error) {
     }
 });
 
+/* Get temperatures
+ * @param limit number of temperatures, max 24*7
+ */
 app.get('/temperatures', function(req, res) {
+    var limit = 24;
+    if (req.query.limit && parseInt(req.query.limit)) {
+        limit = Math.min(parseInt(req.query.limit), 24*7);
+    }
     fs.readFile('temperatures.txt', 'utf-8', function (err, data) {
         if (err) throw err;
             var lines = data.trim().split('\n');
-            var lastLines = lines.slice(-24);
+            var lastLines = lines.slice(-1 * Math.abs(limit));
             var result = lastLines.map(function(line) {
 
                 var fields = line.split(';');
@@ -50,22 +60,6 @@ app.get('/temperatures', function(req, res) {
             });
 
             res.json(result);
-    });
-});
-
-app.get('/current', function(req, res) {
-    fs.readFile('temperatures.txt', 'utf-8', function (err, data) {
-        if (err) throw err;
-            var lines = data.trim().split('\n');
-            var lastLine = lines.slice(-1)[0];
-            var fields = lastLine.split(';');
-
-            var date = fields[0];
-            var temperature = parseFloat(fields[1]);
-            res.json({
-                date: date,
-                temperature: temperature    
-            });
     });
 });
 
