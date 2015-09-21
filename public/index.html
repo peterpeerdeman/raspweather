@@ -66,7 +66,7 @@ $(function () {
     }
 
     function refreshData(limit) {
-        var url = '/temperatures';
+        var url = location.origin + location.pathname + 'temperatures';
         if (limit) {
             url = url + '?limit=' + limit
         }
