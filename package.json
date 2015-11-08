@@ -1,0 +1,25 @@
+{
+  "name": "raspweather",
+  "version": "1.0.0",
+  "description": "",
+  "main": "temperature.js",
+  "dependencies": {
+    "express": "^4.13.3",
+    "request": "^2.65.0",
+    "serialport": "^2.0.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/peterpeerdeman/raspweather.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/peterpeerdeman/raspweather/issues"
+  },
+  "homepage": "https://github.com/peterpeerdeman/raspweather#readme"
+}

@@ -48,7 +48,7 @@ function logOutsideTemperature() {
         PARTICLE_ACCESS_TOKEN].join('');
     request(url, function(error, response, body) {
         if (!error && response.statusCode == 200) {
-            var temperatureFloat = body.result;
+            var temperatureFloat = JSON.parse(body).result;
             var logEntry = new Date().toString() + ';' + temperatureFloat + '\n';
             fs.appendFile('temperatures-outside.txt', logEntry, function(err) {
                 //
@@ -66,8 +66,8 @@ app.get('/temperatures', function(req, res) {
     if (req.query.limit && parseInt(req.query.limit)) {
         limit = Math.min(parseInt(req.query.limit), 24 * 7);
     }
-    if (req.query.location == 'garden') {
-        filename = 'temperatures-garden.txt';
+    if (req.query.location == 'outside') {
+        filename = 'temperatures-outside.txt';
     }
 
     fs.readFile(filename, 'utf-8', function(err, data) {
