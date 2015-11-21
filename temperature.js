@@ -49,6 +49,7 @@ function logOutsideTemperature() {
     request(url, function(error, response, body) {
         if (!error && response.statusCode == 200) {
             var temperatureFloat = JSON.parse(body).result;
+            if (temperatureFloat == "-0.0625" || parseFloat(temperatureFloat) >100) return;
             var logEntry = new Date().toString() + ';' + temperatureFloat + '\n';
             fs.appendFile('temperatures-outside.txt', logEntry, function(err) {
                 //
