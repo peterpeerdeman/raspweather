@@ -69,8 +69,15 @@ $(function () {
     }
 
     function refreshData(limit) {
-        var url = location.origin + location.pathname + 'temperatures';
-        var outsideUrl = location.origin + location.pathname + 'temperatures?location=outside';
+        var baseUrl;
+        if (location.pathname == '/') {
+            baseUrl = location.pathname
+        } else {
+            baseUrl = window.location.href + '/';
+        }
+
+        var url = baseUrl + 'temperatures';
+        var outsideUrl = baseUrl + 'temperatures?location=outside';
         if (limit) {
             url = url + '?limit=' + limit;
             outsideUrl = outsideUrl + '&limit=' + limit;
