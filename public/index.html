@@ -25,7 +25,7 @@ button {
 
     <script>
 $(function () {
-    function drawGraph(livingRoomData, outsideData) {
+    function drawGraph(outsideData) {
         $('#container').highcharts({
             chart: {
                 zoomType: 'x'
@@ -59,9 +59,6 @@ $(function () {
                 enabled: false
             },
             series: [{
-                name: 'Living room',
-                data: livingRoomData
-            },{
                 name: 'Outside',
                 data: outsideData
             }]
@@ -76,23 +73,15 @@ $(function () {
             baseUrl = window.location.href + '/';
         }
 
-        var url = baseUrl + 'temperatures';
         var outsideUrl = baseUrl + 'temperatures?location=outside';
         if (limit) {
-            url = url + '?limit=' + limit;
             outsideUrl = outsideUrl + '&limit=' + limit;
         }
-        var livingroomPromise = $.get(url);
-        var outsidePromise = $.get(outsideUrl);
-        
-        $.when(livingroomPromise, outsidePromise).done(function(livingRoomResult, outsideResult) {
-            var livingRoomData = _.map(livingRoomResult[0], function(value) {
+        $.get(outsideUrl).then(function(outsideResult) {
+            var outsideData = _.map(outsideResult, function(value) {
                 return [new Date(value.date).getTime(), value.temperature];
             });
-            var outsideData = _.map(outsideResult[0], function(value) {
-                return [new Date(value.date).getTime(), value.temperature];
-            });
-            drawGraph(livingRoomData, outsideData);
+            drawGraph(outsideData);
         })
     }
 
